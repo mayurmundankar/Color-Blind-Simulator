@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Blind Simulator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            margin: 0 !important;  /* Override Bootstrap's container margin */
+            padding: 0 !important;  /* Override Bootstrap's container padding */
+            max-width: 100% !important;  /* Override Bootstrap's max-width */
+        }
+
+        .row {
+            margin: 0 !important;  /* Override Bootstrap's row margin */
+        }
+
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f0f4f8;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        #landingPage {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin: 0;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        #landingPage .container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #landingPage .row {
+            width: 100%;
+        }
+
+        #simulatorPage {
+            padding: 20px;
+        }
+
+        .simulator-container {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            /* box-shadow: 0 10px 25px rgba(0,0,0,0.1); */
+            padding: 30px;
+            margin: 10px;
+        }
+
+        .upload-panel {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        #originalImage, #simulatedImage {
+            max-width: 100%;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+        }
+
+        .info-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 6px;
+            margin-bottom: 10px;
+            /* box-shadow: 0 8px 20px rgba(0,0,0,0.06); */
+        }
+
+        #startBtn {
+            background-color: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        #startBtn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #landingPage .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landingPage" class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="display-4">Color Blind Simulator</h1>
+                <p class="lead">Experience the world through different color perception perspectives</p>
+                <button id="startBtn" class="btn mt-3">Get Started</button>
+                <span class="footer">Developed for Educational Purpose Only | All Rights Reserved</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulator Page (Hidden by default) -->
+    <div id="simulatorPage" class="container d-none">
+        <div class="simulator-container">
+            <div class="row">
+                <!-- Left Panel: Upload and Settings -->
+                <div class="col-md-4">
+                    <h3><strong>Color Blindness Simulator</strong></h3>
+                    
+                    <!-- Image Upload -->
+                    <div class="mb-3">
+                        <label for="imageUpload" class="form-label">Upload Image</label>
+                        <input class="form-control" type="file" id="imageUpload" accept="image/*">
+                    </div>
+
+                    <!-- Color Blindness Types -->
+                    <div class="mb-3">
+                        <label for="colorBlindnessType" class="form-label">Color Blindness Type</label>
+                        <select id="colorBlindnessType" class="form-select">
+                            <option value="protanopia">Protanopia (Red-Blind)</option>
+                            <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+                            <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+                            <option value="achromatopsia">Achromatopsia (Complete Color Blindness)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Image Preview -->
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Original Image</h4>
+                            <canvas id="originalImage" width="400" height="300"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Simulated Image</h4>
+                            <canvas id="simulatedImage" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accessibility Information -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="info-card">
+                    <h5><strong>Understanding Color Blindness</strong></h5>
+                    <p>Color blindness affects approximately 1 in 12 men and 1 in 200 women worldwide.</p>
+                    <span>Color blindness, also known as color vision deficiency, is a condition that affects a person's ability to see certain colors or distinguish between them. It's usually caused by a genetic defect in the cone cells of the retina, which are responsible for color vision.</span>
+                    <br>
+                    <br>
+                    <span>Main types of color blindness:</span>
+                    <ul><li><strong>Protanopia:</strong> This is the most common type of red-green color blindness. People with protanopia have difficulty seeing red light. They may see shades of red as gray or brown.</li>
+                    <li><strong>Deuteranopia:</strong> This is another type of red-green color blindness. People with deuteranopia have difficulty seeing green light. They may see shades of green as gray or brown.</li>
+                    <li><strong>Tritanopia:</strong> This is a less common type of color blindness that affects blue-yellow color vision. People with tritanopia have difficulty seeing blue light. They may see shades of blue as gray or green.</li>
+                    <li><strong>Achromatopsia:</strong> This is a rare condition that causes total color blindness. People with achromatopsia see the world in shades of gray.</li></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="info-card">
+                <h5><strong>Reference for Conversion: </strong></h5>
+                <span>The matrices are derived from scientific studies and algorithms that approximate the color perception differences for various types of color blindness. These are well-documented in color science literature, such as:
+                <br>
+                <i>Brettel, H., Viénot, F., & Mollon, J. D. (1997). Computerized Simulation of Color Appearance for Dichromats.</i>
+                <br>
+                Color Vision Deficiency models available in tools like Vischeck or Coblis.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- JavaScript -->
+    <script>
+        // Color Blindness Simulation Matrices
+        const colorBlindnessMatrices = {
+            protanopia: [
+                0.567, 0.433, 0,
+                0.558, 0.442, 0,
+                0, 0.242, 0.758
+            ],
+            deuteranopia: [
+                0.625, 0.375, 0,
+                0.7, 0.3, 0,
+                0, 0.3, 0.7
+            ],
+            tritanopia: [
+                0.95, 0.05, 0,
+                0, 0.433, 0.567,
+                0, 0.475, 0.525
+            ],
+            achromatopsia: [
+                0.299, 0.587, 0.114,
+                0.299, 0.587, 0.114,
+                0.299, 0.587, 0.114
+            ]
+        };
+
+        // DOM Elements
+        const landingPage = document.getElementById('landingPage');
+        const simulatorPage = document.getElementById('simulatorPage');
+        const startBtn = document.getElementById('startBtn');
+        const imageUpload = document.getElementById('imageUpload');
+        const colorBlindnessType = document.getElementById('colorBlindnessType');
+        const originalCanvas = document.getElementById('originalImage');
+        const simulatedCanvas = document.getElementById('simulatedImage');
+
+        // Event Listeners
+        startBtn.addEventListener('click', () => {
+            landingPage.classList.add('d-none');
+            simulatorPage.classList.remove('d-none');
+        });
+
+        imageUpload.addEventListener('change', handleImageUpload);
+        colorBlindnessType.addEventListener('change', simulateColorBlindness);
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    loadImage(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadImage(src) {
+            const img = new Image();
+            img.onload = function() {
+                // Set canvas sizes
+                originalCanvas.width = simulatedCanvas.width = img.width;
+                originalCanvas.height = simulatedCanvas.height = img.height;
+
+                // Draw original image
+                const origCtx = originalCanvas.getContext('2d');
+                origCtx.drawImage(img, 0, 0);
+
+                // Simulate color blindness
+                simulateColorBlindness();
+            };
+            img.src = src;
+        }
+
+        function simulateColorBlindness() {
+            const origCtx = originalCanvas.getContext('2d');
+            const simulatedCtx = simulatedCanvas.getContext('2d');
+            
+            const imageData = origCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
+            const data = imageData.data;
+
+            const matrix = colorBlindnessMatrices[colorBlindnessType.value];
+
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                data[i] = r * matrix[0] + g * matrix[1] + b * matrix[2];
+                data[i + 1] = r * matrix[3] + g * matrix[4] + b * matrix[5];
+                data[i + 2] = r * matrix[6] + g * matrix[7] + b * matrix[8];
+            }
+
+            simulatedCtx.putImageData(imageData, 0, 0);
+        }
+    </script>
+</body>
+</html>
